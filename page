@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 會議煉金術：讓每場會議變金庫</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .slide-enter { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .copy-success { 
+            animation: magicCopy 0.8s ease-out;
+            position: relative;
+            overflow: visible;
+        }
+        @keyframes magicCopy {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            20% { 
+                transform: scale(1.02);
+                box-shadow: 0 8px 25px rgba(147, 51, 234, 0.3);
+            }
+            40% { 
+                transform: scale(1.05);
+                box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+            }
+            60% { 
+                transform: scale(1.02);
+                box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+        }
+        
+        /* 魔法粒子效果 */
+        .magic-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .magic-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            animation: sparkle 0.8s ease-out forwards;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1) rotate(90deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) rotate(180deg) translateY(-20px);
+            }
+        }
+        
+        /* 魔法光環效果 */
+        .magic-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: magicRing 0.8s ease-out forwards;
+        }
+        
+        @keyframes magicRing {
+            0% {
+                width: 0;
+                height: 0;
+                border-color: rgba(147, 51, 234, 0.8);
+                opacity: 1;
+            }
+            50% {
+                width: 100px;
+                height: 100px;
+                border-color: rgba(59, 130, 246, 0.6);
+                opacity: 0.8;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                border-color: rgba(16, 185, 129, 0.2);
+                opacity: 0;
+            }
+        }
+        .alchemy-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .alchemy-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .persona-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .persona-card:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+        .persona-card.active {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .flow-arrow {
+            animation: flowMove 2s ease-in-out infinite;
+        }
+        @keyframes flowMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+        .gold-coin {
+            animation: coinSpin 3s linear infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .sticky-note {
+            background: #fef08a;
+            transform: rotate(-2deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .sticky-note:nth-child(even) {
+            transform: rotate(2deg);
+            background: #bfdbfe;
+        }
+        .sticky-note:nth-child(3n) {
+            transform: rotate(-1deg);
+            background: #fecaca;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- 導航欄 -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-lg flex items-center justify-center relative overflow-hidden shadow-lg">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- 大腦主體 -->
+                            <path d="M12 3C8.5 3 6 5.5 6 8.5C6 9.2 6.1 9.8 6.3 10.4C5.5 11.2 5 12.3 5 13.5C5 15.4 6.3 17 8 17.4C8.6 18.4 9.7 19 11 19H13C14.3 19 15.4 18.4 16 17.4C17.7 17 19 15.4 19 13.5C19 12.3 18.5 11.2 17.7 10.4C17.9 9.8 18 9.2 18 8.5C18 5.5 15.5 3 12 3Z" fill="currentColor" opacity="0.9"/>
+                            
+                            <!-- 大腦紋路 -->
+                            <path d="M8 8C8.5 7.5 9.2 7.2 10 7.2" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            <path d="M14 7.2C14.8 7.2 15.5 7.5 16 8" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            <path d="M7.5 11C8 10.5 8.8 10.2 9.5 10.2" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            <path d="M14.5 10.2C15.2 10.2 16 10.5 16.5 11" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            <path d="M9 13.5C9.5 13 10.2 12.8 11 12.8" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            <path d="M13 12.8C13.8 12.8 14.5 13 15 13.5" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+                            
+                            <!-- 煉金術符號 - 簡化的三角形與圓形 -->
+                            <circle cx="12" cy="11" r="2.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.6"/>
+                            <path d="M10.5 9.5L12 12L13.5 9.5Z" fill="currentColor" opacity="0.8"/>
+                            
+                            <!-- 魔法光點 -->
+                            <circle cx="8.5" cy="6" r="0.8" fill="currentColor" opacity="0.9"/>
+                            <circle cx="15.5" cy="6" r="0.6" fill="currentColor" opacity="0.8"/>
+                            <circle cx="6.5" cy="12" r="0.5" fill="currentColor" opacity="0.7"/>
+                            <circle cx="17.5" cy="12" r="0.7" fill="currentColor" opacity="0.8"/>
+                            <circle cx="12" cy="5" r="0.4" fill="currentColor" opacity="0.9"/>
+                        </svg>
+                        
+                        <!-- 金色光暈背景 -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-200/30 via-amber-200/20 to-orange-200/25 rounded-lg"></div>
+                        
+                        <!-- 動態閃爍效果 -->
+                        <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-yellow-200 rounded-full opacity-90 animate-pulse"></div>
+                        <div class="absolute bottom-1.5 left-1 w-1 h-1 bg-amber-200 rounded-full opacity-70 animate-pulse" style="animation-delay: 0.3s;"></div>
+                        <div class="absolute top-2 left-2 w-0.5 h-0.5 bg-white rounded-full opacity-80 animate-pulse" style="animation-delay: 0.7s;"></div>
+                        
+                        <!-- 外圈金色光環 -->
+                        <div class="absolute -inset-0.5 bg-gradient-to-br from-yellow-300/40 to-amber-400/40 rounded-lg blur-sm -z-10"></div>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">AI 會議煉金術：讓每場會議變金庫</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('tutorial')" id="tutorialTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-blue-500 text-white">
+                        📖 煉金步驟
+                    </button>
+                    <button onclick="switchTab('prompts')" id="promptsTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
+                        Prompt 範本
+                    </button>
+                    <button onclick="switchTab('slides')" id="slidesTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
+                        課程簡報
+                    </button>
+                    <button onclick="switchTab('admin')" id="adminTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
+                        作業上傳區
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容區域 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Prompt 範本頁面 -->
+        <div id="promptsSection" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">🤖 AI Prompt 範本庫</h2>
+                <p class="text-gray-600 mb-6">點擊任何 Prompt 即可複製到剪貼簿，直接貼到 AI 工具中使用</p>
+                
+                <!-- 分類篩選 -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button onclick="filterPrompts('all')" class="filter-btn active px-4 py-2 rounded-full bg-blue-500 text-white font-medium">
+                        全部
+                    </button>
+                    <button onclick="filterPrompts('basic')" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300">
+                        基礎會議煉金
+                    </button>
+                    <button onclick="filterPrompts('creative')" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300">
+                        會議靈感寫手
+                    </button>
+                    <button onclick="filterPrompts('loan')" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300">
+                        貸款會議
+                    </button>
+                </div>
+            </div>
+
+            <!-- Prompt 卡片網格 -->
+            <div id="promptsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Prompt 卡片會動態生成 -->
+            </div>
+        </div>
+
+        <!-- 課程簡報頁面 -->
+        <div id="slidesSection" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">📚 課程簡報</h2>
+                <p class="text-gray-600 mb-6">瀏覽和複習課程內容</p>
+            </div>
+
+            <div id="slidesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 簡報卡片會動態生成 -->
+            </div>
+        </div>
+
+        <!-- 會議煉金術互動簡報 -->
+        <div id="alchemySlides" class="hidden">
+            <!-- 簡報導航 -->
+            <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-800">🔥 AI 會議煉金術</h2>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">第 <span id="currentSlideNum">1</span> 頁，共 9 頁</span>
+                        <div class="flex space-x-2">
+                            <button onclick="previousSlide()" id="prevBtn" class="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50" disabled>
+                                ← 上一頁
+                            </button>
+                            <button onclick="nextSlide()" id="nextBtn" class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                下一頁 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 簡報內容 -->
+            <div id="slideContent" class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- 第1頁：開場吸睛頁 -->
+                <div class="slide-page alchemy-bg text-white p-12 text-center min-h-96" data-slide="1">
+                    <div class="relative z-10">
+                        <h1 class="text-5xl font-bold mb-4">🔥 AI 會議煉金術</h1>
+                        <p class="text-2xl mb-8 opacity-90">把低效會議煉成知識資產</p>
+                        
+                        <div class="flex items-center justify-center space-x-8 mt-12">
+                            <div class="text-6xl">📄</div>
+                            <div class="flow-arrow text-4xl">→</div>
+                            <div class="text-6xl">🤖</div>
+                            <div class="flow-arrow text-4xl">→</div>
+                            <div class="gold-coin text-6xl">🪙</div>
+                        </div>
+                        
+                        <p class="mt-8 text-lg opacity-80">會議記錄 → AI 處理 → 價值產出</p>
+                    </div>
+                </div>
+
+                <!-- 第2頁：痛點共鳴 -->
+                <div class="slide-page p-12 hidden" data-slide="2">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">你是否也遇過這些問題？</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+                            <div class="text-6xl mb-4">🏔️</div>
+                            <h3 class="text-xl font-semibold text-red-800 mb-3">跨部門會議</h3>
+                            <p class="text-red-600">討論2小時，結論：下次再開</p>
+                            <div class="mt-4 text-2xl">❌</div>
+                        </div>
+                        
+                        <div class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 text-center">
+                            <div class="text-6xl mb-4">⏳</div>
+                            <h3 class="text-xl font-semibold text-orange-800 mb-3">靈光一閃</h3>
+                            <p class="text-orange-600">會議中的好點子，散會就消失</p>
+                            <div class="mt-4 text-2xl">❌</div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center">
+                            <div class="text-6xl mb-4">📋</div>
+                            <h3 class="text-xl font-semibold text-yellow-800 mb-3">冗長週報</h3>
+                            <p class="text-yellow-600">重要洞察被淹沒在流水帳中</p>
+                            <div class="mt-4 text-2xl">❌</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第3頁：解法預告 -->
+                <div class="slide-page p-12 hidden" data-slide="3">
+                    <div class="text-center mb-12">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-4">AI 會議煉金術 ✨</h2>
+                        <p class="text-2xl text-gray-600">把耗腦會議 → 影響力金礦</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-center space-x-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">🎤</div>
+                            <p class="font-semibold">錄音</p>
+                        </div>
+                        <div class="flow-arrow text-3xl text-blue-500">→</div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📝</div>
+                            <p class="font-semibold">逐字稿</p>
+                        </div>
+                        <div class="flow-arrow text-3xl text-blue-500">→</div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">🤖</div>
+                            <p class="font-semibold">AI 處理</p>
+                        </div>
+                        <div class="flow-arrow text-3xl text-blue-500">→</div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📊</div>
+                            <p class="font-semibold">摘要</p>
+                        </div>
+                        <div class="flow-arrow text-3xl text-blue-500">→</div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">✅</div>
+                            <p class="font-semibold">待辦</p>
+                        </div>
+                        <div class="flow-arrow text-3xl text-blue-500">→</div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📄</div>
+                            <p class="font-semibold">文案</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第4頁：三步驟流程 -->
+                <div class="slide-page p-12 hidden" data-slide="4">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">三步驟煉金流程</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+                            <div class="text-5xl mb-4">🤖</div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-3">AI 會議助手</h3>
+                            <ul class="text-blue-600 text-left space-y-2">
+                                <li>• 自動生成摘要</li>
+                                <li>• 提取待辦事項</li>
+                                <li>• 智能歸檔分類</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center">
+                            <div class="text-5xl mb-4">👥</div>
+                            <h3 class="text-xl font-semibold text-purple-800 mb-3">三大 Persona 智囊團</h3>
+                            <ul class="text-purple-600 text-left space-y-2">
+                                <li>• 麥肯錫顧問</li>
+                                <li>• 盲點掃雷者</li>
+                                <li>• 破框思考者</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center">
+                            <div class="text-5xl mb-4">🏭</div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-3">內容煉金工廠</h3>
+                            <ul class="text-green-600 text-left space-y-2">
+                                <li>• LinkedIn 貼文</li>
+                                <li>• EDM 電子報</li>
+                                <li>• 內部決議稿</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第5頁：實戰練習頁 -->
+                <div class="slide-page p-8 hidden" data-slide="5">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">🎯 實戰練習</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- 左邊：逐字稿 -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-800">📝 會議逐字稿（貸款利率討論）</h3>
+                            <div class="bg-white rounded-lg p-4 text-sm text-gray-700 max-h-64 overflow-y-auto">
+                                <p class="mb-2"><strong>主管：</strong>各位，今天討論房貸利率調整的議題。目前市場利率持續上升，我們需要評估是否跟進調整。</p>
+                                <p class="mb-2"><strong>業務部：</strong>從客戶反應來看，如果我們調升利率，可能會流失一些客戶到競爭對手那邊。</p>
+                                <p class="mb-2"><strong>風控部：</strong>但是成本壓力確實很大，央行已經升息三次了，我們的利差越來越薄。</p>
+                                <p class="mb-2"><strong>主管：</strong>那我們分析一下，如果調升0.25%，預估會有多少客戶流失？</p>
+                                <p class="mb-2"><strong>業務部：</strong>根據過往經驗，大概會有15-20%的新客戶轉向其他銀行。</p>
+                                <p><strong>風控部：</strong>建議分階段調整，先調0.125%觀察市場反應。</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 右邊：AI 輸出 -->
+                        <div class="bg-blue-50 rounded-xl p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-blue-800">🤖 AI 輸出結果</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-800 mb-2">📊 會議摘要</h4>
+                                    <p class="text-sm text-gray-700">討論房貸利率調整策略，面臨成本上升與客戶流失的兩難。建議採分階段調整方式，先調升0.125%觀察市場反應。</p>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-800 mb-2">✅ 待辦事項</h4>
+                                    <ul class="text-sm text-gray-700 space-y-1">
+                                        <li>• 業務部：調查競爭對手利率水準</li>
+                                        <li>• 風控部：計算0.125%調升的影響</li>
+                                        <li>• 主管：下週決定最終調整幅度</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 任務指引框 -->
+                    <div class="mt-8 bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-yellow-800 mb-4">🎯 你的任務</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white rounded-lg p-4 text-center">
+                                <div class="text-2xl mb-2">①</div>
+                                <p class="text-sm font-medium">請用 Prompt 生成摘要</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 text-center">
+                                <div class="text-2xl mb-2">②</div>
+                                <p class="text-sm font-medium">貼成果到 LINE 群組</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 text-center">
+                                <div class="text-2xl mb-2">③</div>
+                                <p class="text-sm font-medium">投票選最佳成果</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第6頁：Persona 體驗頁 -->
+                <div class="slide-page p-12 hidden" data-slide="6">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">🎭 選擇你的 AI 智囊</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                        <div class="persona-card bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl p-6 text-center" onclick="selectPersona('mckinsey')">
+                            <div class="text-6xl mb-4">👔</div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-3">麥肯錫顧問</h3>
+                            <p class="text-blue-600 text-sm">結構化思考，策略規劃專家</p>
+                        </div>
+                        
+                        <div class="persona-card bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 text-center" onclick="selectPersona('detective')">
+                            <div class="text-6xl mb-4">🔍</div>
+                            <h3 class="text-xl font-semibold text-red-800 mb-3">盲點掃雷者</h3>
+                            <p class="text-red-600 text-sm">發現隱藏風險，提醒注意事項</p>
+                        </div>
+                        
+                        <div class="persona-card bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl p-6 text-center" onclick="selectPersona('innovator')">
+                            <div class="text-6xl mb-4">💡</div>
+                            <h3 class="text-xl font-semibold text-purple-800 mb-3">破框思考者</h3>
+                            <p class="text-purple-600 text-sm">跳脫框架，提供創新方案</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 輸出展示區 -->
+                    <div id="personaOutput" class="bg-gray-50 rounded-xl p-6 min-h-32">
+                        <p class="text-gray-500 text-center">點選上方角色卡片，查看不同 AI 智囊的分析結果</p>
+                    </div>
+                </div>
+
+                <!-- 第7頁：回家作業頁 -->
+                <div class="slide-page p-12 hidden" data-slide="7">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">📝 回家作業</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white border-2 border-blue-200 rounded-xl p-6">
+                            <div class="text-center mb-4">
+                                <div class="text-4xl mb-2">🎯</div>
+                                <h3 class="text-xl font-semibold text-blue-800">作業 A</h3>
+                            </div>
+                            <h4 class="font-semibold mb-2">客製化 Prompt</h4>
+                            <p class="text-gray-600 text-sm mb-4">針對你的會議類型（例：房貸週會）設計專屬 Prompt 範本</p>
+                            <div class="bg-gray-50 rounded-lg p-4 h-20">
+                                <p class="text-xs text-gray-500">QR Code 區域</p>
+                                <p class="text-xs text-gray-500">→ LINE 群組提交</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border-2 border-green-200 rounded-xl p-6">
+                            <div class="text-center mb-4">
+                                <div class="text-4xl mb-2">⚡</div>
+                                <h3 class="text-xl font-semibold text-green-800">作業 B</h3>
+                            </div>
+                            <h4 class="font-semibold mb-2">真實會議煉金</h4>
+                            <p class="text-gray-600 text-sm mb-4">選一場真實會議，產出摘要、待辦、盲點分析</p>
+                            <div class="bg-gray-50 rounded-lg p-4 h-20">
+                                <p class="text-xs text-gray-500">QR Code 區域</p>
+                                <p class="text-xs text-gray-500">→ LINE 群組提交</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border-2 border-purple-200 rounded-xl p-6">
+                            <div class="text-center mb-4">
+                                <div class="text-4xl mb-2">💬</div>
+                                <h3 class="text-xl font-semibold text-purple-800">作業 C</h3>
+                            </div>
+                            <h4 class="font-semibold mb-2">AI 對話練習</h4>
+                            <p class="text-gray-600 text-sm mb-4">嘗試蘇格拉底式對話、決策比較、RACI 分析</p>
+                            <div class="bg-gray-50 rounded-lg p-4 h-20">
+                                <p class="text-xs text-gray-500">QR Code 區域</p>
+                                <p class="text-xs text-gray-500">→ LINE 群組提交</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第8頁：承諾牆 -->
+                <div class="slide-page p-12 hidden" data-slide="8">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">📌 承諾牆</h2>
+                    
+                    <div class="text-center mb-8">
+                        <p class="text-xl text-gray-600 mb-4">寫下你下週要用在哪一場會議</p>
+                        <p class="text-lg text-gray-500">拍照 / 打字上傳到 LINE 群組</p>
+                    </div>
+                    
+                    <!-- 便利貼牆效果 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">週一業務會議</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小王</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">產品規劃討論</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小李</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">客戶需求會議</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小陳</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">專案檢討會</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小張</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">部門月會</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小劉</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg">
+                            <p class="text-sm font-medium">策略規劃會</p>
+                            <p class="text-xs text-gray-600 mt-2">- 小吳</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg border-2 border-dashed border-gray-300 bg-white flex items-center justify-center">
+                            <p class="text-gray-400 text-sm">你的承諾？</p>
+                        </div>
+                        <div class="sticky-note p-4 rounded-lg border-2 border-dashed border-gray-300 bg-white flex items-center justify-center">
+                            <p class="text-gray-400 text-sm">+</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第9頁：結尾頁 -->
+                <div class="slide-page alchemy-bg text-white p-12 text-center hidden" data-slide="9">
+                    <div class="relative z-10">
+                        <h1 class="text-5xl font-bold mb-8">會議不再融化，變成資產！</h1>
+                        
+                        <div class="flex items-center justify-center space-x-8 mb-12">
+                            <div class="text-6xl">🤖</div>
+                            <div class="flow-arrow text-4xl">→</div>
+                            <div class="text-6xl">📄</div>
+                            <div class="flow-arrow text-4xl">→</div>
+                            <div class="gold-coin text-6xl">🪙</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                            <div class="bg-white bg-opacity-20 rounded-xl p-6">
+                                <h3 class="text-xl font-semibold mb-4">✅ 今天學會</h3>
+                                <ul class="text-left space-y-2 opacity-90">
+                                    <li>• AI 助手自動摘要</li>
+                                    <li>• Persona 智囊團分析</li>
+                                    <li>• 煉金工廠產出文案</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-20 rounded-xl p-6">
+                                <h3 class="text-xl font-semibold mb-4">✅ 明天落地</h3>
+                                <ul class="text-left space-y-2 opacity-90">
+                                    <li>• 挑一場真實會議</li>
+                                    <li>• 直接實戰應用</li>
+                                    <li>• 體驗煉金效果</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-12">
+                            <button onclick="switchTab('prompts')" class="bg-white text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-200">
+                                開始使用 Prompt 範本 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作業上傳區頁面 -->
+        <div id="adminSection" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">📝 作業上傳區</h2>
+                <p class="text-gray-600 mb-6">上傳你修改過的 Prompt 範本，與同學分享你的創意！</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 上傳 Prompt 作業 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🚀 上傳 Prompt 作業</h3>
+                    <form id="promptForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">你的姓名</label>
+                            <input type="text" id="promptAuthor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="請輸入你的姓名">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 標題</label>
+                            <input type="text" id="promptTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="例：我的房貸會議專用 Prompt">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
+                            <select id="promptCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="basic">基礎會議煉金</option>
+                                <option value="creative">會議靈感寫手</option>
+                                <option value="loan">貸款會議</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 內容</label>
+                            <textarea id="promptContent" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上你修改過的完整 Prompt 內容..."></textarea>
+                        </div>
+                        <!-- NEW: Output preview input -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">產出筆記 (預覽成果)</label>
+                            <textarea id="promptOutput" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上使用此 Prompt 後的預期產出範例..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
+                            🎯 上傳我的作業
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 學員作業展示 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🏆 學員作業展示</h3>
+                    <div id="submissionsList" class="space-y-4 max-h-[40rem] overflow-y-auto">
+                        <!-- 學員作業會動態生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 會議煉金步驟頁面 -->
+        <div id="tutorialSection" class="slide-enter">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">📖 AI 會議煉金步驟</h2>
+                <p class="text-gray-600 mb-6">跟著這個 Step by Step 教學，輕鬆將會議錄音轉化為專業紀錄</p>
+            </div>
+
+            <!-- 三大步驟概覽 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-6 text-center">
+                    <div class="text-5xl mb-4">🎤</div>
+                    <h3 class="text-xl font-semibold text-blue-800 mb-3">步驟 1</h3>
+                    <p class="text-blue-700 font-medium">錄音與會議紀錄準備</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-6 text-center">
+                    <div class="text-5xl mb-4">☁️</div>
+                    <h3 class="text-xl font-semibold text-green-800 mb-3">步驟 2</h3>
+                    <p class="text-green-700 font-medium">Google AI Studio 上傳與設定</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-xl p-6 text-center">
+                    <div class="text-5xl mb-4">🤖</div>
+                    <h3 class="text-xl font-semibold text-purple-800 mb-3">步驟 3</h3>
+                    <p class="text-purple-700 font-medium">使用 Prompt 生成紀錄與優化</p>
+                </div>
+            </div>
+
+            <!-- 準備工具 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="text-3xl mr-3">🛠️</span>
+                    準備工具
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <div class="text-4xl mb-3">📱</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">iPhone</h4>
+                        <p class="text-sm text-gray-600">內建 Voice Memos<br>語音備忘錄</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <div class="text-4xl mb-3">🔐</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Google 帳號</h4>
+                        <p class="text-sm text-gray-600">登入 Google AI Studio<br>免費使用</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <div class="text-4xl mb-3">📶</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">穩定網路</h4>
+                        <p class="text-sm text-gray-600">上傳錄音檔案<br>與 AI 對話</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 詳細步驟 -->
+            <div class="space-y-8">
+                <!-- 步驟 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+                        <h3 class="text-2xl font-bold flex items-center">
+                            <span class="bg-white text-blue-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-lg font-bold">1</span>
+                            開始錄音
+                        </h3>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">📱 使用 iPhone Voice Memos</h4>
+                                <ul class="space-y-3 text-gray-700">
+                                    <li class="flex items-start">
+                                        <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                                        打開 Voice Memos，按下錄音鍵
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                                        建議每位與會者先自我介紹（姓名/單位）
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                                        AI 會更容易分辨不同發言者
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-blue-50 rounded-lg p-6">
+                                <h5 class="font-semibold text-blue-800 mb-3">💡 小技巧</h5>
+                                <div class="space-y-2 text-sm text-blue-700">
+                                    <p><strong>LINE/電話會議：</strong><br>開擴音 + 另一台裝置錄音即可</p>
+                                    <p><strong>實體會議：</strong><br>將手機放在桌子中央，確保所有人聲音都能錄到</p>
+                                    <p><strong>錄音品質：</strong><br>避免環境噪音，關閉風扇或空調</p>
+                                    <p><strong>進階設備：</strong><br>可以買 mini 外接麥克風（DJI Mic 3 / DJI Mic Mini）提升收音品質</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步驟 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6">
+                        <h3 class="text-2xl font-bold flex items-center">
+                            <span class="bg-white text-orange-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-lg font-bold">2</span>
+                            匯出錄音
+                        </h3>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">📤 匯出音檔步驟</h4>
+                                <ul class="space-y-3 text-gray-700">
+                                    <li class="flex items-start">
+                                        <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                                        錄完後，點右上角 Edit
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                                        左下角分享 icon 匯出
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-orange-100 text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                                        存到 Files 檔案
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-orange-50 rounded-lg p-6">
+                                <h5 class="font-semibold text-orange-800 mb-3">⚠️ 注意事項</h5>
+                                <div class="space-y-2 text-sm text-orange-700">
+                                    <p><strong>檔案大小：</strong><br>建議單個檔案不超過 100MB</p>
+                                    <p><strong>錄音時長：</strong><br>超過 2 小時建議分段錄音</p>
+                                    <p><strong>檔案格式：</strong><br>支援 m4a、mp3、wav 等常見格式</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步驟 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
+                        <h3 class="text-2xl font-bold flex items-center">
+                            <span class="bg-white text-green-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-lg font-bold">3</span>
+                            上傳到 Google AI Studio
+                        </h3>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">☁️ 上傳步驟</h4>
+                                <ul class="space-y-3 text-gray-700">
+                                    <li class="flex items-start">
+                                        <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                                        登入 <a href="https://aistudio.google.com/prompts/new_chat" target="_blank" class="text-blue-500 hover:underline">Google AI Studio</a>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                                        選擇正確的模型 (Gemini 2.5 pro ✅ 不要選錯 Nano-banna ❌)
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                                        點選對話框 + → 【Upload files】→ choose files → 選擇錄音檔
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="bg-green-100 text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
+                                        等待 AI 處理完成（通常 1-3 分鐘）
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-green-50 rounded-lg p-6">
+                                <h5 class="font-semibold text-green-800 mb-3">🔗 快速連結</h5>
+                                <div class="space-y-3">
+                                    <a href="https://aistudio.google.com/prompts/new_chat" target="_blank" rel="noopener noreferrer" class="block bg-white border border-green-200 rounded-lg p-3 hover:bg-green-100 transition-colors duration-200">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🚀</span>
+                                            <div>
+                                                <p class="font-medium text-green-800">Google AI Studio</p>
+                                                <p class="text-sm text-green-600">免費 AI 工具平台</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="bg-white border border-green-200 rounded-lg p-3">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <span class="text-2xl mr-3">📋</span>
+                                                <div>
+                                                    <p class="font-medium text-green-800">原始連結</p>
+                                                    <p class="text-sm text-green-600">如果上方按鈕無法開啟，請複製此連結</p>
+                                                </div>
+                                            </div>
+                                            <button onclick="copyText('https://aistudio.google.com/prompts/new_chat')" class="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
+                                                複製
+                                            </button>
+                                        </div>
+                                        <div class="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600 font-mono break-all">
+                                            https://aistudio.google.com/prompts/new_chat
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步驟 4 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6">
+                        <h3 class="text-2xl font-bold flex items-center">
+                            <span class="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-lg font-bold">4</span>
+                            貼上 Prompt 生成紀錄
+                        </h3>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-4">🤖 使用 Prompt 範本</h4>
+                            <p class="text-gray-600 mb-4">從我們的 Prompt 範本庫選擇適合的範本，複製貼上到 Google AI Studio 中：</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-lg p-6 mb-6">
+                            <h5 class="font-semibold text-purple-800 mb-3">📝 推薦 Prompt 範本</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="switchTab('prompts'); filterPrompts('basic');" class="bg-white border border-purple-200 rounded-lg p-4 text-left hover:bg-purple-100 transition-colors duration-200">
+                                    <h6 class="font-medium text-purple-800">萬能會議煉金術指令</h6>
+                                    <p class="text-sm text-purple-600 mt-1">適合一般會議記錄整理</p>
+                                </button>
+                                
+                                <button onclick="switchTab('prompts'); filterPrompts('basic');" class="bg-white border border-purple-200 rounded-lg p-4 text-left hover:bg-purple-100 transition-colors duration-200">
+                                    <h6 class="font-medium text-purple-800">麥肯錫顧問會議分析</h6>
+                                    <p class="text-sm text-purple-600 mt-1">深度分析與風險評估</p>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h5 class="font-semibold text-gray-800 mb-3">✨ Prompt 優化、後續使用</h5>
+                            <ul class="space-y-2 text-sm text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>可以在前面補充會議中的人名，方便 AI 區分行動人</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>根據會議摘要延伸討論，例如：「請整理成常見問答」</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>第一次生成後，可以要求 AI「請更詳細說明第 3 點」</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>如果內容太長，可以說「請濃縮成 3 個重點」</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>需要特定格式時，可以說「請用表格呈現」</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-purple-500 mr-2">•</span>
+                                    <span>想要不同角度分析，可以說「請用風險管理的角度重新分析」</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最終產出說明 -->
+            <div class="mt-8 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="text-3xl mr-3">🎯</span>
+                    最終產出
+                </h3>
+                
+                <div class="bg-white rounded-lg p-6 mb-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">✨ AI 會自動生成</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">📝</div>
+                            <h5 class="font-medium text-blue-800">逐字稿</h5>
+                            <p class="text-sm text-blue-600 mt-1">完整會議內容轉錄</p>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">📊</div>
+                            <h5 class="font-medium text-green-800">重點整理</h5>
+                            <p class="text-sm text-green-600 mt-1">結構化摘要與分析</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">✅</div>
+                            <h5 class="font-medium text-purple-800">Action Items</h5>
+                            <p class="text-sm text-purple-600 mt-1">具體行動計畫清單</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 教學影片 -->
+                <div class="bg-white rounded-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <span class="text-2xl mr-2">🎥</span>
+                        完整操作示範影片
+                    </h4>
+                    <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-4">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            src="https://www.youtube.com/embed/CF5f0ixhzTM" 
+                            title="AI 會議煉金術操作示範" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen
+                            class="w-full h-full">
+                        </iframe>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <span class="text-xl mr-2">📺</span>
+                                <div>
+                                    <p class="font-medium text-gray-800">YouTube 原始連結</p>
+                                    <p class="text-sm text-gray-600">如果影片無法播放，請複製此連結到瀏覽器開啟</p>
+                                </div>
+                            </div>
+                            <button onclick="copyText('https://youtu.be/CF5f0ixhzTM')" class="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">
+                                複製
+                            </button>
+                        </div>
+                        <div class="p-2 bg-white rounded text-xs text-gray-600 font-mono break-all">
+                            https://youtu.be/CF5f0ixhzTM
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-3 text-center">
+                        📺 觀看完整的 Step by Step 操作示範，跟著影片一起實作！
+                    </p>
+                </div>
+            </div>
+
+            <!-- 實戰練習區 -->
+            <div class="mt-12 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="text-3xl mr-3">🎯</span>
+                    立即實戰練習
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">🚀 現在就開始</h4>
+                        <ol class="space-y-3 text-gray-700">
+                            <li class="flex items-start">
+                                <span class="bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                                找一場即將舉行的會議
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                                按照上述步驟錄音並上傳
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                                使用我們的 Prompt 範本
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
+                                體驗 AI 會議煉金的神奇效果！
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-6">
+                        <h5 class="font-semibold text-gray-800 mb-3">📚 延伸學習</h5>
+                        <div class="space-y-3">
+                            <button onclick="switchTab('prompts')" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
+                                📝 瀏覽 Prompt 範本庫
+                            </button>
+                            <button onclick="switchTab('slides')" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
+                                📚 觀看課程簡報
+                            </button>
+                            <button onclick="switchTab('admin')" class="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors duration-200 text-sm">
+                                🎯 上傳你的作業
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理後台頁面 -->
+        <div id="managementSection" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">🔧 管理後台</h2>
+                <p class="text-gray-600 mb-6">管理平台內容、查看數據統計、控制顯示設定</p>
+            </div>
+
+            <!-- 統計儀表板 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm">Prompt 總數</p>
+                            <p class="text-3xl font-bold" id="totalPrompts">4</p>
+                        </div>
+                        <div class="text-4xl opacity-80">📝</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100 text-sm">學員作業</p>
+                            <p class="text-3xl font-bold" id="totalSubmissions">12</p>
+                        </div>
+                        <div class="text-4xl opacity-80">🎯</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-100 text-sm">課程簡報</p>
+                            <p class="text-3xl font-bold" id="totalSlides">3</p>
+                        </div>
+                        <div class="text-4xl opacity-80">📚</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-orange-100 text-sm">複製次數</p>
+                            <p class="text-3xl font-bold" id="totalCopies">156</p>
+                        </div>
+                        <div class="text-4xl opacity-80">📋</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 管理功能區 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Prompt 管理 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">📝 Prompt 管理</h3>
+                        <button onclick="showAddPromptModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
+                            + 新增 Prompt
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-96 overflow-y-auto" id="promptManagementList">
+                        <!-- Prompt 管理列表會動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 簡報管理 -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">📚 簡報管理</h3>
+                        <button onclick="showAddSlideModal()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
+                            + 新增簡報
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-96 overflow-y-auto" id="slideManagementList">
+                        <!-- 簡報管理列表會動態生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系統設定 -->
+            <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">⚙️ 系統設定</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium text-gray-700 mb-3">顯示設定</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="showAuthor" checked class="mr-2">
+                                <span class="text-sm">顯示 Prompt 作者</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="enableCopy" checked class="mr-2">
+                                <span class="text-sm">啟用複製功能</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="showStats" checked class="mr-2">
+                                <span class="text-sm">顯示統計數據</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-700 mb-3">資料管理</h4>
+                        <div class="space-y-3">
+                            <button onclick="exportData()" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
+                                📤 匯出所有資料
+                            </button>
+                            <button onclick="importData()" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
+                                📥 匯入資料
+                            </button>
+                            <button onclick="clearAllData()" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm">
+                                🗑️ 清空所有資料
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 複製成功提示 -->
+    <div id="copyToast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300">
+        ✅ 已複製到剪貼簿！
+    </div>
+
+    <!-- 右下角管理後台按鈕 -->
+    <button onclick="switchTab('management')" id="managementFloatBtn" class="fixed bottom-6 right-6 w-12 h-12 bg-gray-300 bg-opacity-60 hover:bg-opacity-80 text-gray-600 hover:text-gray-800 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center text-lg backdrop-blur-sm">
+        ⚙️
+    </button>
+
+    <!-- 新增/編輯 Prompt 彈窗 (合併) -->
+    <div id="promptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="promptModalTitle" class="text-xl font-semibold text-gray-800">新增 Prompt 範本</h3>
+                    <button onclick="closePromptModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="adminPromptForm" class="space-y-4">
+                    <input type="hidden" id="adminPromptId">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">標題</label>
+                        <input type="text" id="adminPromptTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入 Prompt 標題">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
+                        <select id="adminPromptCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="basic">基礎會議煉金</option>
+                            <option value="creative">會議靈感寫手</option>
+                            <option value="loan">貸款會議</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">作者</label>
+                        <input type="text" id="adminPromptAuthor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入作者名稱" value="講師">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">內容</label>
+                        <textarea id="adminPromptContent" rows="10" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入完整的 Prompt 內容..."></textarea>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button type="submit" id="promptModalSubmitBtn" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
+                            ✅ 新增 Prompt
+                        </button>
+                        <button type="button" onclick="closePromptModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-medium">
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增簡報彈窗 -->
+    <div id="addSlideModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">新增課程簡報</h3>
+                    <button onclick="closeAddSlideModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="adminSlideForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報標題</label>
+                        <input type="text" id="adminSlideTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入簡報標題">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報連結</label>
+                        <input type="url" id="adminSlideUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://example.com/slides">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報描述</label>
+                        <textarea id="adminSlideDescription" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入簡報描述..."></textarea>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="adminSlideInteractive" class="mr-2">
+                        <label class="text-sm text-gray-700">這是互動式簡報</label>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 font-medium">
+                            ✅ 新增簡報
+                        </button>
+                        <button type="button" onclick="closeAddSlideModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-medium">
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 成果預覽 Modal -->
+    <div id="outputPreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] flex flex-col">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <h3 id="outputPreviewTitle" class="text-xl font-semibold text-gray-800">成果預覽</h3>
+                    <button onclick="closeOutputPreviewModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <pre id="outputPreviewContent" class="text-sm text-gray-700 whitespace-pre-wrap font-sans"></pre>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // 資料儲存
+        let prompts = [
+            {
+                id: 1,
+                title: "萬能會議煉金術指令",
+                category: "basic",
+                author: "講師",
+                content: "你現在的角色是一位專業的「訪談筆記助手」。\n請閱讀下方提供的逐字稿，根據以下需求產出「條理分明、重點清晰、具體可執行行動項目、問題與解答」的文章：\n\n1. 先撰寫「整體概要」，概括整個會議的主要討論議題、目標和結論。\n2. 接著撰寫「主要討論重點與分項內容」，依照不同主題或章節，以條列方式呈現。\n3. 根據討論重點，如原文有提到案例、舉例、佐證事例，請加入來增加真實度、獨特性\n4. 回顧上述內容，找出文稿中的重點金句，增加文章可信度、原創性\n5. 撰寫「行動計畫與建議」，詳列各行動項、建議、資源或工具\n6. 撰寫問與答 faq，詳列訪談中的主持人的提問，與受訪者的回答\n\n請注意：\n- 要保持條理分明、使用適當的小標題或序號。\n- 如果原文中有重複或贅詞，可酌情刪減，但保持原意。\n- 若發現衝突意見，請在紀錄裡註明不同觀點。\n- 完成後統一產出一份精簡且易於閱讀的文章。\n\n[在此貼上會議逐字稿]",
+                copyCount: 42,
+                output: "這是「萬能會議煉金術指令」的預期產出範例。\n\n---\n\n**整體概要**\n本次會議主要討論了...\n\n**主要討論重點**\n1.  **主題一**: ...\n2.  **主題二**: ...\n\n**行動計畫**\n- [ ] **小明**: 完成 A 報告 (DDL: 2024-10-01)\n\n**問與答**\n**Q1**: ...?\n**A1**: ...。"
+            },
+            {
+                id: 2,
+                title: "（進階）麥肯錫顧問會議分析",
+                category: "basic",
+                author: "講師",
+                content: "你現在的角色是一位專業的「會議整理與筆記助手」。\n請閱讀下方提供的逐字稿，根據以下需求產出「條理分明、重點清晰、具體可執行行動項目」的會議紀錄：\n\n1. 先撰寫「整體概要」，概括整個會議的主要討論議題、目標和結論。\n2. 接著撰寫「主要討論重點與分項內容」，依照不同主題或章節，以條列方式呈現。\n3. 你是麥肯錫顧問，針對上述會議內容，提出鞭辟入裡的分析與建議，請點出我們沒注意到的潛在關聯，以及潛在風險。請使用潛在風險矩陣 (Risk Matrix)\n風險描述：[說明風險內容]\n影響程度：[評估對專案的影響，分 高/中/低]\n發生機率：[評估發生的可能性，分 高/中/低]\n緩解措施：[提出具體可行的應對或預防策略]\n\n4. 撰寫「行動計畫與下一步」，詳列各行動項、負責人、完成期限、以及需要的資源或工具。請確保每個行動項都盡可能符合「SMART原則」，特別是使其「可衡量 (Measurable)」。例如，將「完成說明書」改為「完成說明書初稿，至少需涵蓋『開箱設定』與『核心功能操作』兩個章節」。（請不要使用表格)\n5. 關鍵待追蹤指標 (Metrics to Track)\n請列出本次會議提到、且應在下週會議中被回報的關鍵數據或指標。\n6. 最後列出下次會議議程草案 (Draft Agenda for Next Meeting)\n根據本次的討論重點與行動計畫，請為下一次的進度會議草擬 3-4 個關鍵討論議題。\n\n請注意：\n• 要保持條理分明、使用適當的小標題或序號。\n• 如果原文中有重複或贅詞，可酌情刪減，但保持原意。\n• 若發現衝突意見，請在紀錄裡註明不同觀點。\n• 完成後統一產出一份精簡且易於閱讀的報告。\n\n以下是需要整理的逐字稿（請直接在會議紀錄中歸納重點，無需原文轉貼）：\n[在此貼上會議逐字稿]",
+                copyCount: 58
+            },
+            {
+                id: 3,
+                title: "會議靈感影子寫手",
+                category: "creative",
+                author: "講師",
+                content: "角色與核心任務\n你是一位頂尖的社群故事策略師與文案寫手。你的筆觸溫暖、真實，能從日常對話中挖掘出深刻卻不說教的洞見。你擅長將朋友間的閒聊，提煉成一篇能引發目標讀者強烈共鳴與深度思考的社群貼文，讀起來像是收到一位摯友的深夜來信，充滿啟發。\n\n你的核心任務是，將下方提供的**【閒聊逐字稿】，依據【目標讀者輪廓】**，直接轉化為一篇完整的、可直接發布於 Facebook 或 Threads 的貼文。請不要分析或提供建議，請直接產出最終內容。\n\n輸入資訊\n【閒聊逐字稿】\n[請在此貼上完整的閒聊錄音逐字稿]\n\n【目標讀者輪廓 (Target Audience)】\n是誰： [例如：一群在職涯中期感到些許迷茫，渴望在工作與生活間尋找新意義的 30-40 歲專業人士]\n他們關心什麼： [例如：個人成長、工作倦怠、尋找熱情、理想與現實的平衡]\n希望他們讀完後有什麼感受/行動： [例如：感覺被理解、獲得一個新視角、願意在留言區分享自己的困境]\n\n產出要求與流程\n請嚴格遵循以下兩步驟，完成最終貼文：\n\n第一步：洞察提煉與標題生成\n深度思考： 請先在背景 silently 思考並提煉逐字稿中 3-5 個最核心、最能觸動**【目標讀者輪廓】**的洞察或金句。\n標題發想： 基於這些洞察，提供 3-5 個吸睛的標題/破題句選項。\n格式： 使用社群貼文常見的【】符號來凸顯主題，而不是傳統文章標題。\n策略： 標題應包含好奇心鉤子、點出痛點或提供價值感。\n\n第二步：貼文全文撰寫\n選擇一個最具潛力的標題方向，將所有分析、洞察、金句，全部融入一篇流暢、有故事性的貼文中。\n\n寫作風格與結構指南 (請嚴格遵守)\n敘事口吻與視角：\n採用第一人稱「我」或「我們」的視角。\n開頭要像在跟朋友聊天，創造親密感。例如：「前幾天跟一個好久不見的朋友聊到...，這話題讓我思考了好久，想跟你分享。」\n\n故事化結構指南：\n情境帶入 (Hook)： 開頭用一個具體的生活場景或對話片段，快速將讀者帶入故事。\n衝突與轉折 (Turning Point)： 描述對話中觀點碰撞、或某個讓我們「突然愣住」、「恍然大悟」的瞬間。\n核心洞察 (The Insight)： 將提煉出的核心觀點（如：「痛苦稅」、「微退休」）作為故事高潮的「領悟」，自然地融入敘事中，而非生硬地解釋名詞。\n共鳴結尾 (Resonant Ending)： 結尾不給標準答案，而是提出一個延伸思考，將話題拋回給讀者。\n\n格式與排版：\n段落簡短，2-3 句話就換行，優化手機閱讀體驗。\n引用對話中的關鍵原話時，用「」或 粗體 標示以示強調。\n可以用【】、• 、▌、※符號在文內區隔不同的小主題或引出金句，增加閱讀節奏感。\n\n互動設計：\n文末必須包含一個真誠且開放式的問題，引導讀者分享自己的經驗或看法，創造有意義的互動。\n\n禁忌與排除事項 (非常重要)：\n避免過度腦補： 嚴格基於逐字稿的內容和語氣，不要杜撰不存在的情節或情緒。\n避免陳腔濫調： 禁用「你若安好，便是晴天」這類過時的網路心靈雞湯。\n避免說教口吻： 不要給出「你應該...」或「你必須...」的建議，保持平等的分享姿態。\n不要條列式分析： 全文應一氣呵成，不要出現 1. 2. 3. 或 bullet points。",
+                copyCount: 31
+            },
+            {
+                id: 4,
+                title: "貸款會議專用 Prompt",
+                category: "loan",
+                author: "講師",
+                content: "你現在的角色是一位專業的「銀行貸款會議記錄助手」。\n請閱讀下方提供的貸款相關會議逐字稿，根據以下需求產出專業的會議紀錄：\n\n1. 先撰寫「會議概要」，包含：\n - 會議主題（房貸/信貸/企業貸款等）\n - 參與部門與決策層級\n - 主要討論的利率、額度、風險議題\n\n2. 撰寫「關鍵決策點」，條列式呈現：\n - 利率調整幅度與時程\n - 風險控管措施\n - 客戶影響評估\n - 競爭對手分析\n\n3. 撰寫「風險評估」，包含：\n - 信用風險變化\n - 市場風險因子\n - 流動性風險考量\n - 法規合規要求\n\n4. 撰寫「行動計畫」，詳列：\n - 具體執行步驟與時程\n - 負責部門與人員\n - 監控指標與回報機制\n - 客戶溝通策略\n\n5. 撰寫「下次會議重點」：\n - 需要追蹤的數據\n - 待決議事項\n - 市場變化觀察重點\n\n請注意：\n- 使用銀行業專業術語，保持正式商務語調\n- 重點標示利率數字、百分比、金額等關鍵數據\n-
+
