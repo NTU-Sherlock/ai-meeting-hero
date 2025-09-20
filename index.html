@@ -167,6 +167,19 @@
             transform: rotate(-1deg);
             background: #fecaca;
         }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -220,11 +233,8 @@
                     <button onclick="switchTab('prompts')" id="promptsTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
                         Prompt 範本
                     </button>
-                    <button onclick="switchTab('slides')" id="slidesTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
-                        課程簡報
-                    </button>
                     <button onclick="switchTab('admin')" id="adminTab" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500">
-                        作業上傳區
+                        新增範本
                     </button>
                 </div>
             </div>
@@ -258,19 +268,11 @@
 
             <!-- Prompt 卡片網格 -->
             <div id="promptsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Prompt 卡片會動態生成 -->
-            </div>
-        </div>
-
-        <!-- 課程簡報頁面 -->
-        <div id="slidesSection" class="hidden">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">📚 課程簡報</h2>
-                <p class="text-gray-600 mb-6">瀏覽和複習課程內容</p>
-            </div>
-
-            <div id="slidesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 簡報卡片會動態生成 -->
+                <!-- Loading indicator -->
+                <div id="promptsLoader" class="col-span-full flex flex-col items-center justify-center p-12">
+                    <div class="loader"></div>
+                    <p class="text-gray-500 mt-4">正在從後台載入 Prompt 範本...</p>
+                </div>
             </div>
         </div>
 
@@ -642,56 +644,42 @@
             </div>
         </div>
 
-        <!-- 作業上傳區頁面 -->
+        <!-- 新增範本頁面 -->
         <div id="adminSection" class="hidden">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">📝 作業上傳區</h2>
-                <p class="text-gray-600 mb-6">上傳你修改過的 Prompt 範本，與同學分享你的創意！</p>
-            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 lg:p-8 max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">🚀 新增 Prompt 範本</h2>
+                <p class="text-gray-600 mb-6">分享您的 Prompt，豐富我們的範本庫！</p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- 上傳 Prompt 作業 -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🚀 上傳 Prompt 作業</h3>
-                    <form id="promptForm" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">你的姓名</label>
-                            <input type="text" id="promptAuthor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="請輸入你的姓名">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 標題</label>
-                            <input type="text" id="promptTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="例：我的房貸會議專用 Prompt">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-                            <select id="promptCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="basic">基礎會議煉金</option>
-                                <option value="creative">會議靈感寫手</option>
-                                <option value="loan">貸款會議</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 內容</label>
-                            <textarea id="promptContent" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上你修改過的完整 Prompt 內容..."></textarea>
-                        </div>
-                        <!-- NEW: Output preview input -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">產出筆記 (預覽成果)</label>
-                            <textarea id="promptOutput" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上使用此 Prompt 後的預期產出範例..."></textarea>
-                        </div>
-                        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
-                            🎯 上傳我的作業
-                        </button>
-                    </form>
-                </div>
-
-                <!-- 學員作業展示 -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🏆 學員作業展示</h3>
-                    <div id="submissionsList" class="space-y-4 max-h-[40rem] overflow-y-auto">
-                        <!-- 學員作業會動態生成 -->
+                <form id="promptForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">你的姓名</label>
+                        <input type="text" id="promptAuthor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="請輸入你的姓名">
                     </div>
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 標題</label>
+                        <input type="text" id="promptTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="例：我的房貸會議專用 Prompt">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
+                        <select id="promptCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="basic">基礎會議煉金</option>
+                            <option value="creative">會議靈感寫手</option>
+                            <option value="loan">貸款會議</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prompt 內容</label>
+                        <textarea id="promptContent" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上你修改過的完整 Prompt 內容..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">產出筆記 (預覽成果)</label>
+                        <textarea id="promptOutput" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="貼上使用此 Prompt 後的預期產出範例... (可選填)"></textarea>
+                    </div>
+                    <button type="submit" id="submitPromptBtn" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium flex items-center justify-center">
+                        <span id="submitBtnText">🎯 新增至範本庫</span>
+                        <div id="submitBtnLoader" class="loader w-5 h-5 border-2 border-white border-t-transparent ml-2 hidden"></div>
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -887,7 +875,7 @@
                                                 <span class="text-2xl mr-3">📋</span>
                                                 <div>
                                                     <p class="font-medium text-green-800">原始連結</p>
-                                                    <p class="text-sm text-green-600">如果上方按鈕無法開啟，請複製此連結</p>
+                                                    <p class="text-sm text-gray-600">如果上方按鈕無法開啟，請複製此連結</p>
                                                 </div>
                                             </div>
                                             <button onclick="copyText('https://aistudio.google.com/prompts/new_chat')" class="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
@@ -1074,11 +1062,8 @@
                             <button onclick="switchTab('prompts')" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
                                 📝 瀏覽 Prompt 範本庫
                             </button>
-                            <button onclick="switchTab('slides')" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
-                                📚 觀看課程簡報
-                            </button>
                             <button onclick="switchTab('admin')" class="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors duration-200 text-sm">
-                                🎯 上傳你的作業
+                                ➕ 新增您的範本
                             </button>
                         </div>
                     </div>
@@ -1086,127 +1071,6 @@
             </div>
         </div>
 
-        <!-- 管理後台頁面 -->
-        <div id="managementSection" class="hidden">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">🔧 管理後台</h2>
-                <p class="text-gray-600 mb-6">管理平台內容、查看數據統計、控制顯示設定</p>
-            </div>
-
-            <!-- 統計儀表板 -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm">Prompt 總數</p>
-                            <p class="text-3xl font-bold" id="totalPrompts">4</p>
-                        </div>
-                        <div class="text-4xl opacity-80">📝</div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm">學員作業</p>
-                            <p class="text-3xl font-bold" id="totalSubmissions">12</p>
-                        </div>
-                        <div class="text-4xl opacity-80">🎯</div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-purple-100 text-sm">課程簡報</p>
-                            <p class="text-3xl font-bold" id="totalSlides">3</p>
-                        </div>
-                        <div class="text-4xl opacity-80">📚</div>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-orange-100 text-sm">複製次數</p>
-                            <p class="text-3xl font-bold" id="totalCopies">156</p>
-                        </div>
-                        <div class="text-4xl opacity-80">📋</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 管理功能區 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Prompt 管理 -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-semibold text-gray-800">📝 Prompt 管理</h3>
-                        <button onclick="showAddPromptModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
-                            + 新增 Prompt
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="promptManagementList">
-                        <!-- Prompt 管理列表會動態生成 -->
-                    </div>
-                </div>
-
-                <!-- 簡報管理 -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-semibold text-gray-800">📚 簡報管理</h3>
-                        <button onclick="showAddSlideModal()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
-                            + 新增簡報
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="slideManagementList">
-                        <!-- 簡報管理列表會動態生成 -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- 系統設定 -->
-            <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">⚙️ 系統設定</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-3">顯示設定</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center">
-                                <input type="checkbox" id="showAuthor" checked class="mr-2">
-                                <span class="text-sm">顯示 Prompt 作者</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" id="enableCopy" checked class="mr-2">
-                                <span class="text-sm">啟用複製功能</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" id="showStats" checked class="mr-2">
-                                <span class="text-sm">顯示統計數據</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-3">資料管理</h4>
-                        <div class="space-y-3">
-                            <button onclick="exportData()" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm">
-                                📤 匯出所有資料
-                            </button>
-                            <button onclick="importData()" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 text-sm">
-                                📥 匯入資料
-                            </button>
-                            <button onclick="clearAllData()" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm">
-                                🗑️ 清空所有資料
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
     <!-- 複製成功提示 -->
@@ -1214,102 +1078,6 @@
         ✅ 已複製到剪貼簿！
     </div>
 
-    <!-- 右下角管理後台按鈕 -->
-    <button onclick="switchTab('management')" id="managementFloatBtn" class="fixed bottom-6 right-6 w-12 h-12 bg-gray-300 bg-opacity-60 hover:bg-opacity-80 text-gray-600 hover:text-gray-800 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center text-lg backdrop-blur-sm">
-        ⚙️
-    </button>
-
-    <!-- 新增/編輯 Prompt 彈窗 (合併) -->
-    <div id="promptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 id="promptModalTitle" class="text-xl font-semibold text-gray-800">新增 Prompt 範本</h3>
-                    <button onclick="closePromptModal()" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-                
-                <form id="adminPromptForm" class="space-y-4">
-                    <input type="hidden" id="adminPromptId">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">標題</label>
-                        <input type="text" id="adminPromptTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入 Prompt 標題">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-                        <select id="adminPromptCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="basic">基礎會議煉金</option>
-                            <option value="creative">會議靈感寫手</option>
-                            <option value="loan">貸款會議</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">作者</label>
-                        <input type="text" id="adminPromptAuthor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入作者名稱" value="講師">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">內容</label>
-                        <textarea id="adminPromptContent" rows="10" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入完整的 Prompt 內容..."></textarea>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button type="submit" id="promptModalSubmitBtn" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium">
-                            ✅ 新增 Prompt
-                        </button>
-                        <button type="button" onclick="closePromptModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-medium">
-                            取消
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- 新增簡報彈窗 -->
-    <div id="addSlideModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800">新增課程簡報</h3>
-                    <button onclick="closeAddSlideModal()" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-                
-                <form id="adminSlideForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報標題</label>
-                        <input type="text" id="adminSlideTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入簡報標題">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報連結</label>
-                        <input type="url" id="adminSlideUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://example.com/slides">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">簡報描述</label>
-                        <textarea id="adminSlideDescription" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="輸入簡報描述..."></textarea>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="adminSlideInteractive" class="mr-2">
-                        <label class="text-sm text-gray-700">這是互動式簡報</label>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button type="submit" class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors duration-200 font-medium">
-                            ✅ 新增簡報
-                        </button>
-                        <button type="button" onclick="closeAddSlideModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-medium">
-                            取消
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
     <!-- 成果預覽 Modal -->
     <div id="outputPreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] flex flex-col">
@@ -1331,37 +1099,375 @@
 
 
     <script>
-        // 資料儲存
-        let prompts = [
-            {
-                id: 1,
-                title: "萬能會議煉金術指令",
-                category: "basic",
-                author: "講師",
-                content: "你現在的角色是一位專業的「訪談筆記助手」。\n請閱讀下方提供的逐字稿，根據以下需求產出「條理分明、重點清晰、具體可執行行動項目、問題與解答」的文章：\n\n1. 先撰寫「整體概要」，概括整個會議的主要討論議題、目標和結論。\n2. 接著撰寫「主要討論重點與分項內容」，依照不同主題或章節，以條列方式呈現。\n3. 根據討論重點，如原文有提到案例、舉例、佐證事例，請加入來增加真實度、獨特性\n4. 回顧上述內容，找出文稿中的重點金句，增加文章可信度、原創性\n5. 撰寫「行動計畫與建議」，詳列各行動項、建議、資源或工具\n6. 撰寫問與答 faq，詳列訪談中的主持人的提問，與受訪者的回答\n\n請注意：\n- 要保持條理分明、使用適當的小標題或序號。\n- 如果原文中有重複或贅詞，可酌情刪減，但保持原意。\n- 若發現衝突意見，請在紀錄裡註明不同觀點。\n- 完成後統一產出一份精簡且易於閱讀的文章。\n\n[在此貼上會議逐字稿]",
-                copyCount: 42,
-                output: "這是「萬能會議煉金術指令」的預期產出範例。\n\n---\n\n**整體概要**\n本次會議主要討論了...\n\n**主要討論重點**\n1.  **主題一**: ...\n2.  **主題二**: ...\n\n**行動計畫**\n- [ ] **小明**: 完成 A 報告 (DDL: 2024-10-01)\n\n**問與答**\n**Q1**: ...?\n**A1**: ...。"
-            },
-            {
-                id: 2,
-                title: "（進階）麥肯錫顧問會議分析",
-                category: "basic",
-                author: "講師",
-                content: "你現在的角色是一位專業的「會議整理與筆記助手」。\n請閱讀下方提供的逐字稿，根據以下需求產出「條理分明、重點清晰、具體可執行行動項目」的會議紀錄：\n\n1. 先撰寫「整體概要」，概括整個會議的主要討論議題、目標和結論。\n2. 接著撰寫「主要討論重點與分項內容」，依照不同主題或章節，以條列方式呈現。\n3. 你是麥肯錫顧問，針對上述會議內容，提出鞭辟入裡的分析與建議，請點出我們沒注意到的潛在關聯，以及潛在風險。請使用潛在風險矩陣 (Risk Matrix)\n風險描述：[說明風險內容]\n影響程度：[評估對專案的影響，分 高/中/低]\n發生機率：[評估發生的可能性，分 高/中/低]\n緩解措施：[提出具體可行的應對或預防策略]\n\n4. 撰寫「行動計畫與下一步」，詳列各行動項、負責人、完成期限、以及需要的資源或工具。請確保每個行動項都盡可能符合「SMART原則」，特別是使其「可衡量 (Measurable)」。例如，將「完成說明書」改為「完成說明書初稿，至少需涵蓋『開箱設定』與『核心功能操作』兩個章節」。（請不要使用表格)\n5. 關鍵待追蹤指標 (Metrics to Track)\n請列出本次會議提到、且應在下週會議中被回報的關鍵數據或指標。\n6. 最後列出下次會議議程草案 (Draft Agenda for Next Meeting)\n根據本次的討論重點與行動計畫，請為下一次的進度會議草擬 3-4 個關鍵討論議題。\n\n請注意：\n• 要保持條理分明、使用適當的小標題或序號。\n• 如果原文中有重複或贅詞，可酌情刪減，但保持原意。\n• 若發現衝突意見，請在紀錄裡註明不同觀點。\n• 完成後統一產出一份精簡且易於閱讀的報告。\n\n以下是需要整理的逐字稿（請直接在會議紀錄中歸納重點，無需原文轉貼）：\n[在此貼上會議逐字稿]",
-                copyCount: 58
-            },
-            {
-                id: 3,
-                title: "會議靈感影子寫手",
-                category: "creative",
-                author: "講師",
-                content: "角色與核心任務\n你是一位頂尖的社群故事策略師與文案寫手。你的筆觸溫暖、真實，能從日常對話中挖掘出深刻卻不說教的洞見。你擅長將朋友間的閒聊，提煉成一篇能引發目標讀者強烈共鳴與深度思考的社群貼文，讀起來像是收到一位摯友的深夜來信，充滿啟發。\n\n你的核心任務是，將下方提供的**【閒聊逐字稿】，依據【目標讀者輪廓】**，直接轉化為一篇完整的、可直接發布於 Facebook 或 Threads 的貼文。請不要分析或提供建議，請直接產出最終內容。\n\n輸入資訊\n【閒聊逐字稿】\n[請在此貼上完整的閒聊錄音逐字稿]\n\n【目標讀者輪廓 (Target Audience)】\n是誰： [例如：一群在職涯中期感到些許迷茫，渴望在工作與生活間尋找新意義的 30-40 歲專業人士]\n他們關心什麼： [例如：個人成長、工作倦怠、尋找熱情、理想與現實的平衡]\n希望他們讀完後有什麼感受/行動： [例如：感覺被理解、獲得一個新視角、願意在留言區分享自己的困境]\n\n產出要求與流程\n請嚴格遵循以下兩步驟，完成最終貼文：\n\n第一步：洞察提煉與標題生成\n深度思考： 請先在背景 silently 思考並提煉逐字稿中 3-5 個最核心、最能觸動**【目標讀者輪廓】**的洞察或金句。\n標題發想： 基於這些洞察，提供 3-5 個吸睛的標題/破題句選項。\n格式： 使用社群貼文常見的【】符號來凸顯主題，而不是傳統文章標題。\n策略： 標題應包含好奇心鉤子、點出痛點或提供價值感。\n\n第二步：貼文全文撰寫\n選擇一個最具潛力的標題方向，將所有分析、洞察、金句，全部融入一篇流暢、有故事性的貼文中。\n\n寫作風格與結構指南 (請嚴格遵守)\n敘事口吻與視角：\n採用第一人稱「我」或「我們」的視角。\n開頭要像在跟朋友聊天，創造親密感。例如：「前幾天跟一個好久不見的朋友聊到...，這話題讓我思考了好久，想跟你分享。」\n\n故事化結構指南：\n情境帶入 (Hook)： 開頭用一個具體的生活場景或對話片段，快速將讀者帶入故事。\n衝突與轉折 (Turning Point)： 描述對話中觀點碰撞、或某個讓我們「突然愣住」、「恍然大悟」的瞬間。\n核心洞察 (The Insight)： 將提煉出的核心觀點（如：「痛苦稅」、「微退休」）作為故事高潮的「領悟」，自然地融入敘事中，而非生硬地解釋名詞。\n共鳴結尾 (Resonant Ending)： 結尾不給標準答案，而是提出一個延伸思考，將話題拋回給讀者。\n\n格式與排版：\n段落簡短，2-3 句話就換行，優化手機閱讀體驗。\n引用對話中的關鍵原話時，用「」或 粗體 標示以示強調。\n可以用【】、• 、▌、※符號在文內區隔不同的小主題或引出金句，增加閱讀節奏感。\n\n互動設計：\n文末必須包含一個真誠且開放式的問題，引導讀者分享自己的經驗或看法，創造有意義的互動。\n\n禁忌與排除事項 (非常重要)：\n避免過度腦補： 嚴格基於逐字稿的內容和語氣，不要杜撰不存在的情節或情緒。\n避免陳腔濫調： 禁用「你若安好，便是晴天」這類過時的網路心靈雞湯。\n避免說教口吻： 不要給出「你應該...」或「你必須...」的建議，保持平等的分享姿態。\n不要條列式分析： 全文應一氣呵成，不要出現 1. 2. 3. 或 bullet points。",
-                copyCount: 31
-            },
-            {
-                id: 4,
-                title: "貸款會議專用 Prompt",
-                category: "loan",
-                author: "講師",
-                content: "你現在的角色是一位專業的「銀行貸款會議記錄助手」。\n請閱讀下方提供的貸款相關會議逐字稿，根據以下需求產出專業的會議紀錄：\n\n1. 先撰寫「會議概要」，包含：\n - 會議主題（房貸/信貸/企業貸款等）\n - 參與部門與決策層級\n - 主要討論的利率、額度、風險議題\n\n2. 撰寫「關鍵決策點」，條列式呈現：\n - 利率調整幅度與時程\n - 風險控管措施\n - 客戶影響評估\n - 競爭對手分析\n\n3. 撰寫「風險評估」，包含：\n - 信用風險變化\n - 市場風險因子\n - 流動性風險考量\n - 法規合規要求\n\n4. 撰寫「行動計畫」，詳列：\n - 具體執行步驟與時程\n - 負責部門與人員\n - 監控指標與回報機制\n - 客戶溝通策略\n\n5. 撰寫「下次會議重點」：\n - 需要追蹤的數據\n - 待決議事項\n - 市場變化觀察重點\n\n請注意：\n- 使用銀行業專業術語，保持正式商務語調\n- 重點標示利率數字、百分比、金額等關鍵數據\n-
+        // --- 設定 ---
+        const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbz7Qa-oOKYi6zPB4iHpssjDpg9r2zlmOSvDnFdiIjJdxdMviftgYiWHc-SwbAUBs8o/exec";
+        const EXPECTED_SCRIPT_VERSION = "3.0"; // Corresponds to the version in the Apps Script
 
+        // --- 資料儲存 ---
+        let prompts = []; 
+        
+        let currentTab = 'tutorial';
+        let currentFilter = 'all';
+        let currentSlide = 1;
+        const totalSlides = 9;
+
+        // --- 初始化 ---
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadPromptsFromSheet();
+            setupEventListeners();
+            switchTab('tutorial');
+        });
+
+        async function loadPromptsFromSheet() {
+            const loader = document.getElementById('promptsLoader');
+            loader.style.display = 'flex';
+            try {
+                // Step 1: Check script version
+                const versionResponse = await fetch(GOOGLE_SHEET_API_URL + "?action=getVersion", { cache: "no-cache" });
+                if (!versionResponse.ok) throw new Error(`版本檢查失敗！HTTP 狀態: ${versionResponse.status}`);
+                // 某些錯誤的 Apps Script 會回傳 HTML 錯誤頁（例如使用了 withHeaders）導致 JSON 解析失敗
+                const versionRaw = await versionResponse.text();
+                let versionData;
+                try {
+                    versionData = JSON.parse(versionRaw);
+                } catch (parseErr) {
+                    if (versionRaw && versionRaw.includes('withHeaders is not a function')) {
+                        throw new Error('後台 doGet 錯誤：withHeaders 不是有效方法。請移除 ContentService.withHeaders，改用 ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)。');
+                    }
+                    throw new Error('版本檢查回應不是 JSON。請確認您部署的 Apps Script 為最新版並正確回傳 JSON。');
+                }
+                
+                if (versionData.version !== EXPECTED_SCRIPT_VERSION) {
+                    throw new Error(`後台腳本版本不符！\n\n網站需要版本: ${EXPECTED_SCRIPT_VERSION}\n偵測到版本: ${versionData.version || '未知'}\n\n請依照教學文件【重新部署】最新的 Apps Script v3.0。`);
+                }
+
+                // Step 2: Fetch actual data
+                const response = await fetch(GOOGLE_SHEET_API_URL, { cache: "no-cache" });
+                if (!response.ok) throw new Error(`獲取資料失敗！HTTP 狀態: ${response.status}`);
+                const raw = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(raw);
+                } catch (parseErr) {
+                    if (raw && raw.includes('withHeaders is not a function')) {
+                        throw new Error('後台 doGet 錯誤：withHeaders 不是有效方法，導致資料無法載入。');
+                    }
+                    throw new Error('後台回應不是 JSON。請確認 doGet 有回傳 JSON 資料。');
+                }
+                if (data.status === 'error') throw new Error(data.message);
+                prompts = data.map(p => ({
+                    ...p, 
+                    id: parseInt(p.id),
+                    copyCount: parseInt(p.copyCount) || 0
+                }));
+                renderPrompts();
+            } catch (error) {
+                console.error("無法從 Google Sheet 載入資料:", error);
+                let errorMessage = `❌ 後台資料載入失敗：\n${error.message}`;
+                if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+                    errorMessage += "\n\n【重要】這通常是後台部署問題。請確認：\n1. 您已將最新的 Apps Script 程式碼貼上。\n2. 您已【重新部署】並選擇了【新版本】。\n3. 部署時「誰可以存取」設定為「任何人」。";
+                } else if (typeof error.message === 'string' && error.message.includes('withHeaders')) {
+                    errorMessage += "\n\n【立即修正】請打開 Apps Script，移除 TextOutput 的 withHeaders 呼叫。改用：\nreturn ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);";
+                } else if (error.message && error.message.includes("版本不符")) {
+                   errorMessage += "\n\n【重要】請務必依照教學文件指示，用最新的程式碼【重新部署】您的後台腳本才能解決此問題。";
+                }
+                if (loader) loader.innerHTML = `<p class="text-red-500 whitespace-pre-wrap">${errorMessage}</p>`;
+            }
+        }
+
+        // --- 事件監聽 ---
+        function setupEventListeners() {
+            document.getElementById('promptForm').addEventListener('submit', handlePromptSubmit);
+        }
+
+        // --- 核心功能 ---
+        function switchTab(tab) {
+            document.querySelectorAll('nav button').forEach(btn => btn.className = 'px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:text-blue-500');
+            document.getElementById(tab + 'Tab').className = 'px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-blue-500 text-white';
+
+            ['promptsSection', 'adminSection', 'tutorialSection', 'alchemySlides'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            
+            const section = document.getElementById(tab + 'Section');
+            section.classList.remove('hidden');
+            section.classList.add('slide-enter');
+            
+            currentTab = tab;
+        }
+
+        function copyPrompt(promptId, element) {
+            const promptToCopy = prompts.find(p => p.id == promptId);
+            if (!promptToCopy) return;
+
+            const textArea = document.createElement('textarea');
+            textArea.value = promptToCopy.content;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyToast();
+                    promptToCopy.copyCount++;
+                    const countElement = element.querySelector('.copy-count-display');
+                    if (countElement) countElement.textContent = promptToCopy.copyCount;
+                    addMagicEffect(element);
+
+                    fetch(GOOGLE_SHEET_API_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                        body: JSON.stringify({ action: 'incrementCopyCount', id: promptId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== 'success') console.error('後台更新計數時發生錯誤:', data.message);
+                    })
+                    .catch(error => console.error('更新複製次數時發生網路錯誤:', error));
+                } else {
+                     alert('複製失敗');
+                }
+            } catch (err) {
+                console.error('複製時發生錯誤:', err);
+                alert('複製失敗');
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        async function handlePromptSubmit(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitPromptBtn');
+            const btnText = document.getElementById('submitBtnText');
+            const btnLoader = document.getElementById('submitBtnLoader');
+
+            const formData = {
+                author: document.getElementById('promptAuthor').value,
+                title: document.getElementById('promptTitle').value,
+                category: document.getElementById('promptCategory').value,
+                content: document.getElementById('promptContent').value,
+                output: document.getElementById('promptOutput').value
+            };
+
+            if (!formData.author || !formData.title || !formData.content) {
+                alert('請填寫完整資訊（姓名、標題、Prompt 內容都是必填項目）');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.textContent = '新增中...';
+            btnLoader.classList.remove('hidden');
+
+            try {
+                const response = await fetch(GOOGLE_SHEET_API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                    body: JSON.stringify({ action: 'addPrompt', data: formData })
+                });
+                if (!response.ok) {
+                    throw new Error(`後台伺服器錯誤！HTTP 狀態: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status !== 'success') {
+                    if(result.message && (result.message.includes("未知的操作請求") || result.message.includes("action"))) {
+                         throw new Error(`後台腳本不支援此操作。\n\n請確認您已部署【最新版本 v3.0】的 Google Apps Script。`);
+                    }
+                    throw new Error(result.message);
+                }
+                
+                const newPrompt = {
+                  ...result.newData,
+                  id: parseInt(result.newData.id),
+                  copyCount: 0
+                };
+                prompts.push(newPrompt);
+                renderPrompts(); 
+
+                document.getElementById('promptForm').reset();
+                alert('Prompt 範本新增成功！');
+                switchTab('prompts');
+
+            } catch (error) {
+                console.error("新增 Prompt 失敗:", error);
+                let userMessage = `新增失敗：${error.message}`;
+
+                if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+                    userMessage = "【重要修正】\n\n新增範本失敗！ (Failed to fetch)\n\n原因：您的網站無法連接到後台。這通常是後台部署設定錯誤造成的。\n\n如何修正：\n1. 請打開您的 Google Apps Script 專案。\n2. 點擊「部署」 > 「管理部署作業」 > 點擊鉛筆圖示「編輯」。\n3. 在「版本」下拉選單中選擇【新版本】後，點擊「部署」。\n4. 請務必確認部署時，「誰可以存取」設定為【任何人】。\n\n完成以上步驟後，再回來嘗試新增一次即可成功。"
+                } else if (error.message && error.message.includes("後台腳本不支援")) {
+                    userMessage = "【重要修正】\n\n新增範本失敗！\n\n原因：您後台的 Google Apps Script 腳本不是最新版本，無法處理新增請求。\n\n如何修正：\n1. 請打開我提供的「如何使用 Google Sheets 作為後台資料庫 (最終修正版)」文件。\n2. 複製裡面「第二步」的【全新程式碼】。\n3. 到您的 Apps Script 編輯器，刪掉所有舊程式碼，貼上新的。\n4. 嚴格按照教學文件的「第三步」【重新部署】。\n\n完成以上步驟後，再回來嘗試新增一次即可成功。";
+                }
+                alert(userMessage);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = '🎯 新增至範本庫';
+                btnLoader.classList.add('hidden');
+            }
+        }
+        
+        // --- 渲染函式 ---
+        function renderPrompts() {
+            const grid = document.getElementById('promptsGrid');
+            const loader = document.getElementById('promptsLoader');
+            if (loader) loader.style.display = 'none';
+
+            const filteredPrompts = currentFilter === 'all' ? prompts : prompts.filter(p => p.category === currentFilter);
+            
+            if (prompts.length > 0 && filteredPrompts.length === 0) { 
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500">此分類下沒有 Prompt 範本。</p>`;
+                return;
+            }
+
+            grid.innerHTML = filteredPrompts.map(prompt => `
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-800 flex-1">${prompt.title}</h3>
+                            <span class="ml-2 px-3 py-1 text-xs font-medium rounded-full ${getCategoryColor(prompt.category)}">
+                                ${getCategoryName(prompt.category)}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                            <span>作者：${prompt.author || '講師'}</span>
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <span class="copy-count-display">${prompt.copyCount || 0}</span>
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed line-clamp-4">${prompt.content.substring(0, 150)}...</p>
+                    </div>
+                     <div class="p-6 pt-0 flex flex-wrap gap-2">
+                        <button class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm font-medium" onclick="copyPrompt(${prompt.id}, this.closest('.bg-white'))">
+                            複製指令
+                        </button>
+                        ${prompt.output && prompt.output.trim() ? `<button class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm font-medium" onclick="showOutputPreview(${prompt.id})">預覽成果</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // --- 輔助函式 ---
+        function filterPrompts(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = 'filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300';
+            });
+            event.target.className = 'filter-btn active px-4 py-2 rounded-full bg-blue-500 text-white font-medium';
+            renderPrompts();
+        }
+
+        function addMagicEffect(element) {
+            element.classList.add('copy-success');
+            const particlesContainer = document.createElement('div');
+            particlesContainer.className = 'magic-particles';
+            element.appendChild(particlesContainer);
+            const magicRing = document.createElement('div');
+            magicRing.className = 'magic-ring';
+            element.appendChild(magicRing);
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => createMagicParticle(particlesContainer), i * 100);
+            }
+            setTimeout(() => {
+                element.classList.remove('copy-success');
+                if (particlesContainer.parentNode) particlesContainer.remove();
+                if (magicRing.parentNode) magicRing.remove();
+            }, 800);
+        }
+
+        function createMagicParticle(container) {
+            const particle = document.createElement('div');
+            particle.className = 'magic-particle';
+            particle.style.left = (Math.random() * 100) + '%';
+            particle.style.top = (Math.random() * 100) + '%';
+            const colors = ['#fbbf24', '#a855f7', '#3b82f6', '#10b981', '#f472b6'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            const size = 3 + Math.random() * 4;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            container.appendChild(particle);
+            setTimeout(() => {
+                if (particle.parentNode) particle.remove();
+            }, 800);
+        }
+
+        function showCopyToast() {
+            const toast = document.getElementById('copyToast');
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(120%)';
+            }, 2000);
+        }
+
+        function copyText(text) {
+             const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopyToast();
+            } catch (err) {
+                alert('複製失敗');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function getCategoryColor(category) {
+            const colors = { basic: 'bg-blue-100 text-blue-800', creative: 'bg-purple-100 text-purple-800', loan: 'bg-green-100 text-green-800' };
+            return colors[category] || 'bg-gray-100 text-gray-800';
+        }
+        function getCategoryName(category) {
+            const names = { basic: '基礎會議煉金', creative: '會議靈感寫手', loan: '貸款會議' };
+            return names[category] || category;
+        }
+        
+        function openAlchemySlides() {
+            document.getElementById('slidesSection').classList.add('hidden');
+            document.getElementById('alchemySlides').classList.remove('hidden');
+            showSlide(1);
+        }
+        function showSlide(slideNum) {
+            document.querySelectorAll('.slide-page').forEach(page => page.classList.add('hidden'));
+            document.querySelector(`[data-slide="${slideNum}"]`).classList.remove('hidden');
+            document.getElementById('currentSlideNum').textContent = slideNum;
+            document.getElementById('prevBtn').disabled = slideNum === 1;
+            document.getElementById('nextBtn').disabled = slideNum === totalSlides;
+            currentSlide = slideNum;
+        }
+        function previousSlide() { if (currentSlide > 1) showSlide(currentSlide - 1); }
+        function nextSlide() { if (currentSlide < totalSlides) showSlide(currentSlide + 1); }
+        function selectPersona(persona) {
+            document.querySelectorAll('.persona-card').forEach(card => card.classList.remove('active'));
+            event.target.closest('.persona-card').classList.add('active');
+            const outputs = {
+                mckinsey: `<h4 class="font-semibold text-blue-800 mb-3">👔 麥肯錫顧問分析</h4><div class="bg-blue-50 rounded-lg p-4"><h5 class="font-medium mb-2">結構化建議：</h5><ul class="text-sm space-y-1"><li>• 建立利率調整決策矩陣</li><li>• 分階段實施策略（0.125% → 觀察 → 調整）</li><li>• 建立客戶流失預警機制</li><li>• 制定競爭對手監控流程</li></ul></div>`,
+                detective: `<h4 class="font-semibold text-red-800 mb-3">🔍 盲點掃雷者提醒</h4><div class="bg-red-50 rounded-lg p-4"><h5 class="font-medium mb-2">潛在風險：</h5><ul class="text-sm space-y-1"><li>• 未考慮現有客戶的續約反應</li><li>• 缺乏不同客戶群體的敏感度分析</li><li>• 調整時機可能影響季度業績</li><li>• 需要評估法規合規要求</li></ul></div>`,
+                innovator: `<h4 class="font-semibold text-purple-800 mb-3">💡 破框思考者建議</h4><div class="bg-purple-50 rounded-lg p-4"><h5 class="font-medium mb-2">創新方案：</h5><ul class="text-sm space-y-1"><li>• 推出「利率保護險」產品</li><li>• 建立動態利率調整機制</li><li>• 與 Fintech 合作提供增值服務</li><li>• 開發客戶忠誠度積分系統</li></ul></div>`
+            };
+            document.getElementById('personaOutput').innerHTML = outputs[persona];
+        }
+
+        function showOutputPreview(promptId) {
+            const prompt = prompts.find(p => p.id == promptId);
+            if (!prompt || !prompt.output) return;
+            document.getElementById('outputPreviewTitle').textContent = `成果預覽：${prompt.title}`;
+            document.getElementById('outputPreviewContent').textContent = prompt.output;
+            document.getElementById('outputPreviewModal').classList.add('flex');
+            document.getElementById('outputPreviewModal').classList.remove('hidden');
+        }
+        
+        function closeOutputPreviewModal() {
+            document.getElementById('outputPreviewModal').classList.remove('flex');
+            document.getElementById('outputPreviewModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
