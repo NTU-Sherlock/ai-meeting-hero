@@ -1098,10 +1098,14 @@
     </div>
 
 
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // --- 設定 ---
-        const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbz7Qa-oOKYi6zPB4iHpssjDpg9r2zlmOSvDnFdiIjJdxdMviftgYiWHc-SwbAUBs8o/exec";
-        const EXPECTED_SCRIPT_VERSION = "4.0"; // Corresponds to the version in the Apps Script
+        // --- Supabase 設定 ---
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // 替換成你的 Supabase URL
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // 替換成你的 Supabase anon key
+        
+        // 初始化 Supabase 客戶端
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- 資料儲存 ---
         let prompts = []; 
@@ -1122,54 +1126,25 @@
             const loader = document.getElementById('promptsLoader');
             loader.style.display = 'flex';
             try {
-                // Step 1: Check script version
-                const versionResponse = await fetch(GOOGLE_SHEET_API_URL + "?action=getVersion", { cache: "no-cache" });
-                if (!versionResponse.ok) throw new Error(`版本檢查失敗！HTTP 狀態: ${versionResponse.status}`);
-                // 某些錯誤的 Apps Script 會回傳 HTML 錯誤頁（例如使用了 withHeaders）導致 JSON 解析失敗
-                const versionRaw = await versionResponse.text();
-                let versionData;
-                try {
-                    versionData = JSON.parse(versionRaw);
-                } catch (parseErr) {
-                    if (versionRaw && versionRaw.includes('withHeaders is not a function')) {
-                        throw new Error('後台 doGet 錯誤：withHeaders 不是有效方法。請移除 ContentService.withHeaders，改用 ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)。');
-                    }
-                    throw new Error('版本檢查回應不是 JSON。請確認您部署的 Apps Script 為最新版並正確回傳 JSON。');
-                }
-                
-                if (versionData.version !== EXPECTED_SCRIPT_VERSION) {
-                    throw new Error(`後台腳本版本不符！\n\n網站需要版本: ${EXPECTED_SCRIPT_VERSION}\n偵測到版本: ${versionData.version || '未知'}\n\n請依照教學文件【重新部署】最新的 Apps Script v3.0。`);
-                }
+                // 從 Supabase 載入資料
+                const { data, error } = await supabase
+                    .from('prompts')
+                    .select('*')
+                    .order('id', { ascending: true });
 
-                // Step 2: Fetch actual data
-                const response = await fetch(GOOGLE_SHEET_API_URL, { cache: "no-cache" });
-                if (!response.ok) throw new Error(`獲取資料失敗！HTTP 狀態: ${response.status}`);
-                const raw = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(raw);
-                } catch (parseErr) {
-                    if (raw && raw.includes('withHeaders is not a function')) {
-                        throw new Error('後台 doGet 錯誤：withHeaders 不是有效方法，導致資料無法載入。');
-                    }
-                    throw new Error('後台回應不是 JSON。請確認 doGet 有回傳 JSON 資料。');
-                }
-                if (data.status === 'error') throw new Error(data.message);
+                if (error) throw new Error(`Supabase 錯誤: ${error.message}`);
+                
                 prompts = data.map(p => ({
                     ...p, 
                     id: parseInt(p.id),
-                    copyCount: parseInt(p.copyCount) || 0
+                    copyCount: parseInt(p.copy_count) || 0
                 }));
                 renderPrompts();
             } catch (error) {
-                console.error("無法從 Google Sheet 載入資料:", error);
-                let errorMessage = `❌ 後台資料載入失敗：\n${error.message}`;
-                if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-                    errorMessage += "\n\n【重要】這通常是後台部署問題。請確認：\n1. 您已將最新的 Apps Script 程式碼貼上。\n2. 您已【重新部署】並選擇了【新版本】。\n3. 部署時「誰可以存取」設定為「任何人」。";
-                } else if (typeof error.message === 'string' && error.message.includes('withHeaders')) {
-                    errorMessage += "\n\n【立即修正】請打開 Apps Script，移除 TextOutput 的 withHeaders 呼叫。改用：\nreturn ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);";
-                } else if (error.message && error.message.includes("版本不符")) {
-                   errorMessage += "\n\n【重要】請務必依照教學文件指示，用最新的程式碼【重新部署】您的後台腳本才能解決此問題。";
+                console.error("無法從 Supabase 載入資料:", error);
+                let errorMessage = `❌ 資料載入失敗：\n${error.message}`;
+                if (error.message.includes('YOUR_SUPABASE_URL')) {
+                    errorMessage += "\n\n【設定錯誤】請先設定 Supabase URL 和 API Key：\n1. 前往 supabase.com 建立專案\n2. 複製 Project URL 和 anon key\n3. 替換 index.html 中的 YOUR_SUPABASE_URL 和 YOUR_SUPABASE_ANON_KEY";
                 }
                 if (loader) loader.innerHTML = `<p class="text-red-500 whitespace-pre-wrap">${errorMessage}</p>`;
             }
@@ -1219,16 +1194,14 @@
                     if (countElement) countElement.textContent = promptToCopy.copyCount;
                     addMagicEffect(element);
 
-                    fetch(GOOGLE_SHEET_API_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                        body: JSON.stringify({ action: 'incrementCopyCount', id: promptId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status !== 'success') console.error('後台更新計數時發生錯誤:', data.message);
-                    })
-                    .catch(error => console.error('更新複製次數時發生網路錯誤:', error));
+                    // 更新 Supabase 中的複製次數
+                    supabase
+                        .from('prompts')
+                        .update({ copy_count: promptToCopy.copyCount })
+                        .eq('id', promptId)
+                        .then(({ error }) => {
+                            if (error) console.error('更新複製次數時發生錯誤:', error);
+                        });
                 } else {
                      alert('複製失敗');
                 }
@@ -1263,27 +1236,25 @@
             btnLoader.classList.remove('hidden');
 
             try {
-                const response = await fetch(GOOGLE_SHEET_API_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                    body: JSON.stringify({ action: 'addPrompt', data: formData })
-                });
-                if (!response.ok) {
-                    throw new Error(`後台伺服器錯誤！HTTP 狀態: ${response.status}`);
-                }
-                const result = await response.json();
+                // 新增到 Supabase
+                const { data, error } = await supabase
+                    .from('prompts')
+                    .insert([{
+                        title: formData.title,
+                        category: formData.category,
+                        author: formData.author,
+                        content: formData.content,
+                        output: formData.output || '',
+                        copy_count: 0
+                    }])
+                    .select();
 
-                if (result.status !== 'success') {
-                    if(result.message && (result.message.includes("未知的操作請求") || result.message.includes("action"))) {
-                         throw new Error(`後台腳本不支援此操作。\n\n請確認您已部署【最新版本 v3.0】的 Google Apps Script。`);
-                    }
-                    throw new Error(result.message);
-                }
+                if (error) throw new Error(`Supabase 錯誤: ${error.message}`);
                 
                 const newPrompt = {
-                  ...result.newData,
-                  id: parseInt(result.newData.id),
-                  copyCount: 0
+                    ...data[0],
+                    id: parseInt(data[0].id),
+                    copyCount: 0
                 };
                 prompts.push(newPrompt);
                 renderPrompts(); 
@@ -1295,11 +1266,9 @@
             } catch (error) {
                 console.error("新增 Prompt 失敗:", error);
                 let userMessage = `新增失敗：${error.message}`;
-
-                if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-                    userMessage = "【重要修正】\n\n新增範本失敗！ (Failed to fetch)\n\n原因：您的網站無法連接到後台。這通常是後台部署設定錯誤造成的。\n\n如何修正：\n1. 請打開您的 Google Apps Script 專案。\n2. 點擊「部署」 > 「管理部署作業」 > 點擊鉛筆圖示「編輯」。\n3. 在「版本」下拉選單中選擇【新版本】後，點擊「部署」。\n4. 請務必確認部署時，「誰可以存取」設定為【任何人】。\n\n完成以上步驟後，再回來嘗試新增一次即可成功。"
-                } else if (error.message && error.message.includes("後台腳本不支援")) {
-                    userMessage = "【重要修正】\n\n新增範本失敗！\n\n原因：您後台的 Google Apps Script 腳本不是最新版本，無法處理新增請求。\n\n如何修正：\n1. 請打開我提供的「如何使用 Google Sheets 作為後台資料庫 (最終修正版)」文件。\n2. 複製裡面「第二步」的【全新程式碼】。\n3. 到您的 Apps Script 編輯器，刪掉所有舊程式碼，貼上新的。\n4. 嚴格按照教學文件的「第三步」【重新部署】。\n\n完成以上步驟後，再回來嘗試新增一次即可成功。";
+                
+                if (error.message.includes('YOUR_SUPABASE_URL')) {
+                    userMessage = "【設定錯誤】請先設定 Supabase：\n1. 前往 supabase.com 建立專案\n2. 複製 Project URL 和 anon key\n3. 替換 index.html 中的設定";
                 }
                 alert(userMessage);
             } finally {
